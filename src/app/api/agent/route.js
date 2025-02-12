@@ -69,6 +69,7 @@ export async function PUT(req) {
       xTools,
       tgTools,
       chatMessage,
+      tgFirstMessage,
     } = await req.json();
 
     const agent = await collection.findOne({ id: oldId });
@@ -96,6 +97,7 @@ export async function PUT(req) {
         app.prompt = tgPrompt;
         app.chat_message = chatMessage;
         app.tools = tgTools;
+        app.first_message = tgFirstMessage;
       }
     });
 

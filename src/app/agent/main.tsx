@@ -21,6 +21,7 @@ export default function PromptEditor() {
     xTools: [] as ToolsType[],
     tgTools: [] as ToolsType[],
     chatMessage: "",
+    tgFirstMessage: "",
   });
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function PromptEditor() {
       xTools: [],
       chatMessage: "",
       tgTools: [],
+      tgFirstMessage: "",
     });
 
     agent.apps.forEach((app: AppType) => {
@@ -75,6 +77,7 @@ export default function PromptEditor() {
         setFormData((prev) => ({
           ...prev,
           telegramPrompt: app.prompt,
+          tgFirstMessage: app.first_message || "",
           chatMessage: app.chat_message || "",
 
           tgTools:
@@ -129,6 +132,7 @@ export default function PromptEditor() {
         tgPrompt: formData.telegramPrompt,
         chatMessage: formData.chatMessage,
         tgTools: formData.tgTools,
+        tgFirstMessage: formData.tgFirstMessage,
       }),
     });
 
@@ -434,6 +438,17 @@ export default function PromptEditor() {
             </div>
             <div>
               <p className="whitespace-pre-wrap">
+                <strong>First Message:</strong> {formData.tgFirstMessage}
+              </p>
+              <textarea
+                className="border p-3 w-full h-20 rounded-lg whitespace-pre-wrap"
+                value={formData.tgFirstMessage}
+                name="tgFirstMessage"
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <p className="whitespace-pre-wrap">
                 <strong>Chat Message:</strong> {formData.chatMessage}
               </p>
               <textarea
@@ -487,7 +502,7 @@ export default function PromptEditor() {
                   {tool.params !== undefined ? (
                     <>
                       {tool.params.map((param, paramIndex) =>
-                        paramIndex > tool.secrets ? (
+                        paramIndex >= tool.secrets ? (
                           <div key={paramIndex} className="flex space-x-2 mt-2">
                             <textarea
                               className="border p-2 w-full rounded-lg whitespace-pre-wrap"
