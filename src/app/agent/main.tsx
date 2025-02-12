@@ -441,145 +441,151 @@ export default function PromptEditor() {
                 onChange={handleChange}
               />
             </div>
-          </div>
-          <div>
             <div>
-              <strong>Telegram Tools:</strong>
-              {formData.tgTools.map((tool, index) => (
-                <div key={index} className="my-2">
-                  <strong>Item: </strong>
-                  <p className="whitespace-pre-wrap">{tool.item}</p>
-                  <strong>Parameters: </strong>
+              <div>
+                <strong>Telegram Tools:</strong>
+                {formData.tgTools.map((tool, index) => (
+                  <div key={index} className="my-2">
+                    <strong>Item: </strong>
+                    <p className="whitespace-pre-wrap">{tool.item}</p>
+                    <strong>Parameters: </strong>
+                    {tool.params !== undefined ? (
+                      <>
+                        {tool.params.map((param, index) =>
+                          index > 1 ? (
+                            <li className="whitespace-pre-wrap" key={index}>
+                              {param}
+                            </li>
+                          ) : null
+                        )}
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {formData.tgTools.map((tool, toolIndex) => (
+                <div
+                  key={toolIndex}
+                  className="mb-4 p-4 bg-gray-200 rounded-lg"
+                >
+                  <input
+                    className="border p-2 w-full rounded-lg whitespace-pre-wrap"
+                    value={tool.item}
+                    onChange={(e) =>
+                      handleArrayChange(
+                        "tgTools",
+                        formData.tgTools.map((f, i) =>
+                          i === toolIndex ? { ...f, item: e.target.value } : f
+                        )
+                      )
+                    }
+                  />
                   {tool.params !== undefined ? (
                     <>
-                      {tool.params.map((param, index) =>
-                        index > 1 ? (
-                          <li className="whitespace-pre-wrap" key={index}>
-                            {param}
-                          </li>
+                      {tool.params.map((param, paramIndex) =>
+                        paramIndex > 1 ? (
+                          <div key={paramIndex} className="flex space-x-2 mt-2">
+                            <textarea
+                              className="border p-2 w-full rounded-lg whitespace-pre-wrap"
+                              value={param}
+                              onChange={(e) =>
+                                handleArrayChange(
+                                  "tgTools",
+                                  formData.tgTools.map((t, i) =>
+                                    i === toolIndex
+                                      ? {
+                                          ...t,
+                                          params: t.params.map((p, j) =>
+                                            j === paramIndex
+                                              ? e.target.value
+                                              : p
+                                          ),
+                                        }
+                                      : t
+                                  )
+                                )
+                              }
+                            />
+                            <button
+                              onClick={() =>
+                                handleArrayChange(
+                                  "tgTools",
+                                  formData.tgTools.map((t, i) =>
+                                    i === toolIndex
+                                      ? {
+                                          ...t,
+                                          params: t.params.filter(
+                                            (_, j) => j !== paramIndex
+                                          ),
+                                        }
+                                      : t
+                                  )
+                                )
+                              }
+                              className="bg-red-500 text-white px-3 py-1 rounded"
+                            >
+                              Remove
+                            </button>
+                          </div>
                         ) : null
                       )}
                     </>
                   ) : (
                     <></>
                   )}
+                  <div>
+                    <button
+                      onClick={() =>
+                        handleArrayChange(
+                          "tgTools",
+                          formData.tgTools.map((t, i) =>
+                            i === toolIndex
+                              ? {
+                                  ...t,
+                                  params: Array.isArray(t.params)
+                                    ? [...t.params, ""]
+                                    : [""],
+                                }
+                              : t
+                          )
+                        )
+                      }
+                      className="mt-2 bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      Add Parameter
+                    </button>
+                  </div>
+                  <div>
+                    <button
+                      onClick={() =>
+                        handleArrayChange(
+                          "tgTools",
+                          formData.tgTools.filter((_, i) => i !== toolIndex)
+                        )
+                      }
+                      className="mt-2 bg-red-500 text-white px-3 py-1 rounded"
+                    >
+                      Remove Tool
+                    </button>
+                  </div>
                 </div>
               ))}
+              <button
+                onClick={() =>
+                  handleArrayChange("tgTools", [
+                    ...formData.tgTools,
+                    { item: "", params: [] },
+                  ])
+                }
+                className="mt-2 bg-green-500 text-white px-3 py-1 rounded"
+              >
+                Add Tool
+              </button>
             </div>
-            {formData.tgTools.map((tool, toolIndex) => (
-              <div key={toolIndex} className="mb-4 p-4 bg-gray-200 rounded-lg">
-                <input
-                  className="border p-2 w-full rounded-lg whitespace-pre-wrap"
-                  value={tool.item}
-                  onChange={(e) =>
-                    handleArrayChange(
-                      "tgTools",
-                      formData.tgTools.map((f, i) =>
-                        i === toolIndex ? { ...f, item: e.target.value } : f
-                      )
-                    )
-                  }
-                />
-                {tool.params !== undefined ? (
-                  <>
-                    {tool.params.map((param, paramIndex) =>
-                      paramIndex > 1 ? (
-                        <div key={paramIndex} className="flex space-x-2 mt-2">
-                          <input
-                            className="border p-2 w-full rounded-lg whitespace-pre-wrap"
-                            value={param}
-                            onChange={(e) =>
-                              handleArrayChange(
-                                "tgTools",
-                                formData.tgTools.map((t, i) =>
-                                  i === toolIndex
-                                    ? {
-                                        ...t,
-                                        params: t.params.map((p, j) =>
-                                          j === paramIndex ? e.target.value : p
-                                        ),
-                                      }
-                                    : t
-                                )
-                              )
-                            }
-                          />
-                          <button
-                            onClick={() =>
-                              handleArrayChange(
-                                "tgTools",
-                                formData.tgTools.map((t, i) =>
-                                  i === toolIndex
-                                    ? {
-                                        ...t,
-                                        params: t.params.filter(
-                                          (_, j) => j !== paramIndex
-                                        ),
-                                      }
-                                    : t
-                                )
-                              )
-                            }
-                            className="bg-red-500 text-white px-3 py-1 rounded"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ) : null
-                    )}
-                  </>
-                ) : (
-                  <></>
-                )}
-                <div>
-                  <button
-                    onClick={() =>
-                      handleArrayChange(
-                        "tgTools",
-                        formData.tgTools.map((t, i) =>
-                          i === toolIndex
-                            ? {
-                                ...t,
-                                params: Array.isArray(t.params)
-                                  ? [...t.params, ""]
-                                  : [""],
-                              }
-                            : t
-                        )
-                      )
-                    }
-                    className="mt-2 bg-blue-500 text-white px-3 py-1 rounded"
-                  >
-                    Add Parameter
-                  </button>
-                </div>
-                <div>
-                  <button
-                    onClick={() =>
-                      handleArrayChange(
-                        "tgTools",
-                        formData.tgTools.filter((_, i) => i !== toolIndex)
-                      )
-                    }
-                    className="mt-2 bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Remove Tool
-                  </button>
-                </div>
-              </div>
-            ))}
-            <button
-              onClick={() =>
-                handleArrayChange("tgTools", [
-                  ...formData.tgTools,
-                  { item: "", params: [] },
-                ])
-              }
-              className="mt-2 bg-green-500 text-white px-3 py-1 rounded"
-            >
-              Add Tool
-            </button>
           </div>
+
           <button
             onClick={handleSaveAgent}
             className="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200 ease-in-out disabled:opacity-50"
