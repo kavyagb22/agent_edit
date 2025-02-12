@@ -19,6 +19,8 @@ export default function PromptEditor() {
     telegramPrompt: "",
     xFollow: [] as string[],
     xTools: [] as ToolsType[],
+    tgTools: [] as ToolsType[],
+    chatMessage: "",
   });
 
   useEffect(() => {
@@ -52,6 +54,8 @@ export default function PromptEditor() {
       telegramPrompt: "",
       xFollow: [],
       xTools: [],
+      chatMessage: "",
+      tgTools: [],
     });
 
     agent.apps.forEach((app: AppType) => {
@@ -71,6 +75,12 @@ export default function PromptEditor() {
         setFormData((prev) => ({
           ...prev,
           telegramPrompt: app.prompt,
+          chatMessage: app.chat_message || "",
+          tgTools:
+            app.tools?.map((tool) => ({
+              ...tool,
+              params: tool.params || [],
+            })) || [],
         }));
     });
 
@@ -87,7 +97,10 @@ export default function PromptEditor() {
     }));
   };
 
-  const handleArrayChange = (key: "xFollow" | "xTools", value: any) => {
+  const handleArrayChange = (
+    key: "xFollow" | "xTools" | "tgTools",
+    value: any
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [key]: value,
@@ -112,6 +125,8 @@ export default function PromptEditor() {
         xFollow: formData.xFollow,
         xTools: formData.xTools,
         tgPrompt: formData.telegramPrompt,
+        chatMessage: formData.chatMessage,
+        tgTools: formData.tgTools,
       }),
     });
 
@@ -274,7 +289,7 @@ export default function PromptEditor() {
                   <div key={index} className="my-2">
                     <strong>Item: </strong>
                     <p className="whitespace-pre-wrap">{tool.item}</p>
-                    <strong>Paramters: </strong>
+                    <strong>Parameters: </strong>
                     {tool.params !== undefined ? (
                       <>
                         {tool.params.map((param, index) => (
@@ -411,9 +426,159 @@ export default function PromptEditor() {
               <textarea
                 className="border p-3 w-full h-20 rounded-lg whitespace-pre-wrap"
                 value={formData.telegramPrompt}
+                name="telegramPrompt"
                 onChange={handleChange}
               />
             </div>
+            <div>
+              <p className="whitespace-pre-wrap">
+                <strong>Chat Message:</strong> {formData.chatMessage}
+              </p>
+              <textarea
+                className="border p-3 w-full h-20 rounded-lg whitespace-pre-wrap"
+                value={formData.chatMessage}
+                name="chatMessage"
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+          <div>
+            <div>
+              <strong>Telegram Tools:</strong>
+              {formData.tgTools.map((tool, index) => (
+                <div key={index} className="my-2">
+                  <strong>Item: </strong>
+                  <p className="whitespace-pre-wrap">{tool.item}</p>
+                  <strong>Parameters: </strong>
+                  {tool.params !== undefined ? (
+                    <>
+                      {tool.params.map((param, index) =>
+                        index > 1 ? (
+                          <li className="whitespace-pre-wrap" key={index}>
+                            {param}
+                          </li>
+                        ) : null
+                      )}
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              ))}
+            </div>
+            {formData.tgTools.map((tool, toolIndex) => (
+              <div key={toolIndex} className="mb-4 p-4 bg-gray-200 rounded-lg">
+                <input
+                  className="border p-2 w-full rounded-lg whitespace-pre-wrap"
+                  value={tool.item}
+                  onChange={(e) =>
+                    handleArrayChange(
+                      "tgTools",
+                      formData.tgTools.map((f, i) =>
+                        i === toolIndex ? { ...f, item: e.target.value } : f
+                      )
+                    )
+                  }
+                />
+                {tool.params !== undefined ? (
+                  <>
+                    {tool.params.map((param, paramIndex) =>
+                      paramIndex > 1 ? (
+                        <div key={paramIndex} className="flex space-x-2 mt-2">
+                          <input
+                            className="border p-2 w-full rounded-lg whitespace-pre-wrap"
+                            value={param}
+                            onChange={(e) =>
+                              handleArrayChange(
+                                "tgTools",
+                                formData.tgTools.map((t, i) =>
+                                  i === toolIndex
+                                    ? {
+                                        ...t,
+                                        params: t.params.map((p, j) =>
+                                          j === paramIndex ? e.target.value : p
+                                        ),
+                                      }
+                                    : t
+                                )
+                              )
+                            }
+                          />
+                          <button
+                            onClick={() =>
+                              handleArrayChange(
+                                "tgTools",
+                                formData.tgTools.map((t, i) =>
+                                  i === toolIndex
+                                    ? {
+                                        ...t,
+                                        params: t.params.filter(
+                                          (_, j) => j !== paramIndex
+                                        ),
+                                      }
+                                    : t
+                                )
+                              )
+                            }
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : null
+                    )}
+                  </>
+                ) : (
+                  <></>
+                )}
+                <div>
+                  <button
+                    onClick={() =>
+                      handleArrayChange(
+                        "tgTools",
+                        formData.tgTools.map((t, i) =>
+                          i === toolIndex
+                            ? {
+                                ...t,
+                                params: Array.isArray(t.params)
+                                  ? [...t.params, ""]
+                                  : [""],
+                              }
+                            : t
+                        )
+                      )
+                    }
+                    className="mt-2 bg-blue-500 text-white px-3 py-1 rounded"
+                  >
+                    Add Parameter
+                  </button>
+                </div>
+                <div>
+                  <button
+                    onClick={() =>
+                      handleArrayChange(
+                        "tgTools",
+                        formData.tgTools.filter((_, i) => i !== toolIndex)
+                      )
+                    }
+                    className="mt-2 bg-red-500 text-white px-3 py-1 rounded"
+                  >
+                    Remove Tool
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                handleArrayChange("tgTools", [
+                  ...formData.tgTools,
+                  { item: "", params: [] },
+                ])
+              }
+              className="mt-2 bg-green-500 text-white px-3 py-1 rounded"
+            >
+              Add Tool
+            </button>
           </div>
           <button
             onClick={handleSaveAgent}

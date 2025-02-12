@@ -10,6 +10,7 @@ export type AppType = {
   token_secret?: string;
   tools?: ToolsType[];
   first_message?: string;
+  chat_message?: string;
 };
 
 export type ToolsType = {
