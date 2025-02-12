@@ -76,10 +76,12 @@ export default function PromptEditor() {
           ...prev,
           telegramPrompt: app.prompt,
           chatMessage: app.chat_message || "",
+
           tgTools:
             app.tools?.map((tool) => ({
               ...tool,
               params: tool.params || [],
+              secrets: tool.secrets || 0,
             })) || [],
         }));
     });
@@ -452,7 +454,7 @@ export default function PromptEditor() {
                     {tool.params !== undefined ? (
                       <>
                         {tool.params.map((param, index) =>
-                          index > 1 ? (
+                          index >= tool.secrets ? (
                             <li className="whitespace-pre-wrap" key={index}>
                               {param}
                             </li>
@@ -485,7 +487,7 @@ export default function PromptEditor() {
                   {tool.params !== undefined ? (
                     <>
                       {tool.params.map((param, paramIndex) =>
-                        paramIndex > 1 ? (
+                        paramIndex > tool.secrets ? (
                           <div key={paramIndex} className="flex space-x-2 mt-2">
                             <textarea
                               className="border p-2 w-full rounded-lg whitespace-pre-wrap"

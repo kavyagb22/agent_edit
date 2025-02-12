@@ -16,4 +16,5 @@ export type AppType = {
 export type ToolsType = {
   item: string;
   params: string[];
+  secrets: number;
 };
